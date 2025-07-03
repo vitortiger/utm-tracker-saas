@@ -1,7 +1,8 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.models import db
-from src.models.user import User, TelegramBot
+from src.models.user import User
+from src.models.telegram_bot import TelegramBot
 import requests
 
 telegram_bots_bp = Blueprint('telegram_bots', __name__)
