@@ -4,6 +4,7 @@ from src.models import db
 
 class InviteLink(db.Model):
     __tablename__ = 'invite_links'
+    __table_args__ = {'extend_existing': True}
     
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     campaign_id = db.Column(db.String(36), db.ForeignKey('campaigns.id'), nullable=False)
