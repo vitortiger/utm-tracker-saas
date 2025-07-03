@@ -4,6 +4,7 @@ from src.models import db
 
 class TelegramBot(db.Model):
     __tablename__ = 'telegram_bots'
+    __table_args__ = {'extend_existing': True}
     
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
