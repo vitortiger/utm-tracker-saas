@@ -77,8 +77,6 @@ def create_app():
     
     @app.route('/<path:path>')
     def serve_react_routes(path):
-        if path.startswith('api/'):
-            return jsonify({'error': 'API endpoint not found'}), 404
         
         # Check if file exists in static folder
         if os.path.exists(os.path.join(app.static_folder, path)):
