@@ -16,6 +16,7 @@ load_dotenv()
 # Import models and routes
 from src.models import db
 
+
 from src.routes.auth import auth_bp
 from src.routes.telegram_bots import telegram_bots_bp
 from src.routes.campaigns import campaigns_bp
