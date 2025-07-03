@@ -8,7 +8,7 @@ auth_bp = Blueprint('auth', __name__)
 
 def validate_email(email):
     """Validate email format"""
-    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    pattern = r'^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(pattern, email) is not None
 
 def validate_password(password):
@@ -16,6 +16,11 @@ def validate_password(password):
     if len(password) < 6:
         return False, "Password must be at least 6 characters long"
     return True, ""
+
+# ROTA DE TESTE PARA VERIFICAR SE O BLUEPRINT FUNCIONA
+@auth_bp.route('/test')
+def test():
+    return jsonify({'message': 'Auth blueprint is working!', 'status': 'success'})
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
@@ -113,50 +118,9 @@ def get_current_user():
     except Exception as e:
         return jsonify({'error': 'Failed to get user info', 'details': str(e)}), 500
 
-@auth_bp.route('/profile', methods=['PUT'])
+@auth_bp.route('/logout', methods=['POST'])
 @jwt_required()
-def update_profile():
-    try:
-        current_user_id = get_jwt_identity()
-        user = User.query.get(current_user_id)
-        
-        if not user:
-            return jsonify({'error': 'User not found'}), 404
-        
-        data = request.get_json()
-        
-        # Update name if provided
-        if 'name' in data:
-            user.name = data['name'].strip()
-        
-        # Update email if provided
-        if 'email' in data:
-            new_email = data['email'].lower().strip()
-            if not validate_email(new_email):
-                return jsonify({'error': 'Invalid email format'}), 400
-            
-            # Check if email is already taken by another user
-            existing_user = User.query.filter_by(email=new_email).first()
-            if existing_user and existing_user.id != user.id:
-                return jsonify({'error': 'Email already taken'}), 409
-            
-            user.email = new_email
-        
-        # Update password if provided
-        if 'password' in data:
-            is_valid, error_msg = validate_password(data['password'])
-            if not is_valid:
-                return jsonify({'error': error_msg}), 400
-            user.set_password(data['password'])
-        
-        db.session.commit()
-        
-        return jsonify({
-            'message': 'Profile updated successfully',
-            'user': user.to_dict()
-        }), 200
-        
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': 'Failed to update profile', 'details': str(e)}), 500
-
+def logout():
+    # Note: With JWT, logout is typically handled client-side by removing the token
+    # For server-side logout, you would need to implement a token blacklist
+    return jsonify({'message': 'Logout successful'}), 200
