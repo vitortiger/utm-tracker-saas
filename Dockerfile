@@ -6,7 +6,7 @@ COPY frontend/package*.json ./
 RUN npm install
 COPY frontend/ ./
 
-ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
+ENV VITE_API_BASE_URL=https://utm-tracker-saas-utm-tracker-app.c0fl94.easypanel.host/api
 
 RUN npm run build
 
