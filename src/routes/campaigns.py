@@ -1,7 +1,10 @@
 from flask import Blueprint, request, jsonify, url_for
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.models import db
-from src.models.user import User, TelegramBot, Campaign, TelegramLead, InviteLink
+from src.models.campaign import Campaign
+from src.models.telegram_bot import TelegramBot
+from src.models.lead import TelegramLead
+from src.models.invite_link import InviteLink
 from sqlalchemy import func, desc
 from datetime import datetime, timedelta
 import os
