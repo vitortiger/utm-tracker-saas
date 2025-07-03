@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: "https://utm-tracker-saas-utm-tracker-app.c0fl94.easypanel.host/api",
   headers: {
     'Content-Type': 'application/json',
   },
