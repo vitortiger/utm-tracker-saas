@@ -1,6 +1,9 @@
 from flask import Blueprint, request, jsonify, redirect
 from src.models import db
-from src.models.user import Campaign, InviteLink, TelegramLead, TelegramBot
+from src.models.campaign import Campaign
+from src.models.invite_link import InviteLink
+from src.models.lead import TelegramLead
+from src.models.telegram_bot import TelegramBot
 from datetime import datetime
 import requests
 import time
