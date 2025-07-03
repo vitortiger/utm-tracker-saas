@@ -17,6 +17,21 @@ def validate_password(password):
         return False, "Password must be at least 6 characters long"
     return True, ""
 
+def ensure_tables_exist():
+    """Garantir que as tabelas existem, criando se necessário"""
+    try:
+        # Tentar fazer uma query simples para verificar se a tabela existe
+        User.query.first()
+        return True
+    except Exception:
+        try:
+            # Se falhar, criar todas as tabelas
+            db.create_all()
+            return True
+        except Exception as e:
+            print(f"Erro ao criar tabelas: {e}")
+            return False
+
 # ROTA DE TESTE PARA VERIFICAR SE O BLUEPRINT FUNCIONA
 @auth_bp.route('/test')
 def test():
@@ -49,15 +64,11 @@ def init_db():
 @auth_bp.route('/register', methods=['POST'])
 def register():
     try:
-        # Verificar se as tabelas existem
-        try:
-            # Tentar fazer uma query simples para verificar se a tabela existe
-            User.query.first()
-        except Exception as table_error:
+        # Garantir que as tabelas existem
+        if not ensure_tables_exist():
             return jsonify({
-                'error': 'Database not initialized. Please run /api/auth/init-db first.',
-                'details': str(table_error),
-                'action': 'init_required'
+                'error': 'Failed to initialize database tables',
+                'action': 'database_error'
             }), 500
         
         data = request.get_json()
@@ -111,14 +122,11 @@ def register():
 @auth_bp.route('/login', methods=['POST'])
 def login():
     try:
-        # Verificar se as tabelas existem
-        try:
-            User.query.first()
-        except Exception as table_error:
+        # Garantir que as tabelas existem
+        if not ensure_tables_exist():
             return jsonify({
-                'error': 'Database not initialized. Please run /api/auth/init-db first.',
-                'details': str(table_error),
-                'action': 'init_required'
+                'error': 'Failed to initialize database tables',
+                'action': 'database_error'
             }), 500
         
         data = request.get_json()
