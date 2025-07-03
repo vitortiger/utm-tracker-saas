@@ -15,11 +15,6 @@ load_dotenv()
 
 # Import models and routes
 from src.models import db
-from src.models.user import User
-from src.models.telegram_bot import TelegramBot
-from src.models.campaign import Campaign
-from src.models.lead import Lead
-from src.models.invite_link import InviteLink
 
 from src.routes.auth import auth_bp
 from src.routes.telegram_bots import telegram_bots_bp
