@@ -22,9 +22,44 @@ def validate_password(password):
 def test():
     return jsonify({'message': 'Auth blueprint is working!', 'status': 'success'})
 
+# ROTA PARA INICIALIZAR O BANCO DE DADOS
+@auth_bp.route('/init-db', methods=['POST'])
+def init_db():
+    try:
+        # Criar todas as tabelas
+        db.create_all()
+        
+        # Verificar se as tabelas foram criadas
+        inspector = db.inspect(db.engine)
+        tables = inspector.get_table_names()
+        
+        return jsonify({
+            'message': 'Database initialized successfully',
+            'tables': tables,
+            'status': 'success'
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'error': 'Failed to initialize database',
+            'details': str(e),
+            'status': 'error'
+        }), 500
+
 @auth_bp.route('/register', methods=['POST'])
 def register():
     try:
+        # Verificar se as tabelas existem
+        try:
+            # Tentar fazer uma query simples para verificar se a tabela existe
+            User.query.first()
+        except Exception as table_error:
+            return jsonify({
+                'error': 'Database not initialized. Please run /api/auth/init-db first.',
+                'details': str(table_error),
+                'action': 'init_required'
+            }), 500
+        
         data = request.get_json()
         
         # Validate required fields
@@ -45,7 +80,8 @@ def register():
             return jsonify({'error': error_msg}), 400
         
         # Check if user already exists
-        if User.query.filter_by(email=email).first():
+        existing_user = User.query.filter_by(email=email).first()
+        if existing_user:
             return jsonify({'error': 'Email already registered'}), 409
         
         # Create new user
@@ -66,11 +102,25 @@ def register():
         
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': 'Registration failed', 'details': str(e)}), 500
+        return jsonify({
+            'error': 'Registration failed',
+            'details': str(e),
+            'type': type(e).__name__
+        }), 500
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
     try:
+        # Verificar se as tabelas existem
+        try:
+            User.query.first()
+        except Exception as table_error:
+            return jsonify({
+                'error': 'Database not initialized. Please run /api/auth/init-db first.',
+                'details': str(table_error),
+                'action': 'init_required'
+            }), 500
+        
         data = request.get_json()
         
         # Validate required fields
@@ -99,7 +149,11 @@ def login():
         }), 200
         
     except Exception as e:
-        return jsonify({'error': 'Login failed', 'details': str(e)}), 500
+        return jsonify({
+            'error': 'Login failed',
+            'details': str(e),
+            'type': type(e).__name__
+        }), 500
 
 @auth_bp.route('/me', methods=['GET'])
 @jwt_required()
