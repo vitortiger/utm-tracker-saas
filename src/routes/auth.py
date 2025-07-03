@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from src.models import db
-from src.models.user import User
+from src.models import User
 import re
 
 auth_bp = Blueprint('auth', __name__)
@@ -16,6 +16,7 @@ def validate_password(password):
     if len(password) < 6:
         return False, "Password must be at least 6 characters long"
     return True, ""
+
 
 
 # ROTA DE TESTE PARA VERIFICAR SE O BLUEPRINT FUNCIONA
@@ -50,6 +51,12 @@ def init_db():
 @auth_bp.route('/register', methods=['POST'])
 def register():
     try:
+        # Garantir que as tabelas existem
+        if not ensure_tables_exist():
+            return jsonify({
+                'error': 'Failed to initialize database tables',
+                'action': 'database_error'
+            }), 500
         
         data = request.get_json()
         
@@ -102,6 +109,12 @@ def register():
 @auth_bp.route('/login', methods=['POST'])
 def login():
     try:
+        # Garantir que as tabelas existem
+        if not ensure_tables_exist():
+            return jsonify({
+                'error': 'Failed to initialize database tables',
+                'action': 'database_error'
+            }), 500
         
         data = request.get_json()
         
